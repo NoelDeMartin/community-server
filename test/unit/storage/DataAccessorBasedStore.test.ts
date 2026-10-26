@@ -1,5 +1,7 @@
 import 'jest-rdf';
+import { once } from 'node:events';
 import type { Readable } from 'node:stream';
+import type { Quad } from '@rdfjs/types';
 import arrayifyStream from 'arrayify-stream';
 import { DataFactory, Store } from 'n3';
 import type { Conditions } from '../../../src';
@@ -167,6 +169,74 @@ describe('A DataAccessorBasedStore', (): void => {
       expect(result.metadata.contentType).toEqual(INTERNAL_QUADS);
       expect(result.metadata.get(namedNode('AUXILIARY'))?.value)
         .toBe(auxiliaryStrategy.getAuxiliaryIdentifier(resourceID).path);
+      expect(result.metadata.get(SOLID_META.terms.containerEmpty, SOLID_META.terms.ResponseMetadata))
+        .toEqualRdfTerm(literal('true', XSD.terms.boolean));
+    });
+
+    it('keeps large container listings lazy and releases their child iterator on cancellation.', async():
+    Promise<void> => {
+      const resourceID = { path: `${root}container/` };
+      containerMetadata.identifier = namedNode(resourceID.path);
+      accessor.data[resourceID.path] = { metadata: containerMetadata } as Representation;
+
+      const childCount = 100_000;
+      let generatedChildren = 0;
+      let iteratorClosed = false;
+      accessor.getChildren = async function* (): AsyncIterableIterator<RepresentationMetadata> {
+        try {
+          for (let i = 0; i < childCount; ++i) {
+            generatedChildren += 1;
+            const child = new RepresentationMetadata({ path: `${resourceID.path}${i}` });
+            child.add(RDF.terms.type, LDP.terms.Resource);
+            yield child;
+          }
+        } finally {
+          iteratorClosed = true;
+        }
+      };
+
+      const result = await store.getRepresentation(resourceID);
+
+      expect(generatedChildren).toBe(1);
+      expect(result.metadata.getAll(LDP.terms.contains)).toHaveLength(0);
+      expect(result.metadata.get(SOLID_META.terms.containerEmpty, SOLID_META.terms.ResponseMetadata))
+        .toEqualRdfTerm(literal('false', XSD.terms.boolean));
+
+      const iterator = result.data[Symbol.asyncIterator]();
+      for (let i = 0; i < 20; ++i) {
+        expect((await iterator.next()).done).toBe(false);
+      }
+      expect(generatedChildren).toBeLessThan(20);
+
+      const closed = new Promise<void>((resolve): void => {
+        result.data.once('close', resolve);
+      });
+      await iterator.return?.();
+      await closed;
+      expect(iteratorClosed).toBe(true);
+      expect(generatedChildren).toBeLessThan(childCount);
+    });
+
+    it('releases the child iterator when an unread listing is destroyed.', async(): Promise<void> => {
+      const resourceID = { path: `${root}container/` };
+      containerMetadata.identifier = namedNode(resourceID.path);
+      accessor.data[resourceID.path] = { metadata: containerMetadata } as Representation;
+
+      let iteratorClosed = false;
+      accessor.getChildren = async function* (): AsyncIterableIterator<RepresentationMetadata> {
+        try {
+          yield new RepresentationMetadata({ path: `${resourceID.path}child` });
+        } finally {
+          iteratorClosed = true;
+        }
+      };
+
+      const result = await store.getRepresentation(resourceID);
+      const closed = once(result.data, 'close');
+      result.data.destroy();
+      await closed;
+
+      expect(iteratorClosed).toBe(true);
     });
 
     it('will remove containment triples referencing auxiliary resources.', async(): Promise<void> => {
@@ -177,7 +247,8 @@ describe('A DataAccessorBasedStore', (): void => {
       accessor.data[`${resourceID.path}resource`] = representation;
       accessor.data[`${resourceID.path}resource.dummy`] = representation;
       const result = await store.getRepresentation(resourceID);
-      const contains = result.metadata.getAll(LDP.terms.contains);
+      const quads = await arrayifyStream<Quad>(result.data);
+      const contains = new Store(quads).getObjects(namedNode(resourceID.path), LDP.terms.contains, null);
       expect(contains).toHaveLength(1);
       expect(contains[0].value).toBe(`${resourceID.path}resource`);
     });
