@@ -21,7 +21,7 @@
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.8.0">
     
     
       
@@ -29,10 +29,10 @@
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.57a0d79d.min.css">
       
         
-        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.fb2fffe2.min.css">
       
       
 
@@ -2144,16 +2144,16 @@ mkdir<span class="w"> </span>-p<span class="w"> </span>../conformance/reports/cs
 docker<span class="w"> </span>pull<span class="w"> </span>solidproject/conformance-test-harness
 
 <span class="c1"># Set up the env file necessary for the CTH</span>
-<span class="nb">echo</span><span class="w"> </span><span class="s1">&#39;SOLID_IDENTITY_PROVIDER=http://localhost:3000/idp/</span>
+<span class="nb">echo</span><span class="w"> </span><span class="s1">'SOLID_IDENTITY_PROVIDER=http://localhost:3000/idp/</span>
 <span class="s1">USERS_ALICE_WEBID=http://localhost:3000/alice/profile/card#me</span>
 <span class="s1">USERS_BOB_WEBID=http://localhost:3000/bob/profile/card#me</span>
 <span class="s1">RESOURCE_SERVER_ROOT=http://localhost:3000</span>
 <span class="s1">TEST_CONTAINER=/alice/</span>
-<span class="s1">quarkus.log.category.&quot;ResultLogger&quot;.level=INFO</span>
-<span class="s1">quarkus.log.category.&quot;com.intuit.karate&quot;.level=DEBUG</span>
-<span class="s1">quarkus.log.category.&quot;org.solid.testharness.http.Client&quot;.level=DEBUG</span>
-<span class="s1">quarkus.log.category.&quot;org.solid.testharness.http.AuthManager&quot;.level=DEBUG</span>
-<span class="s1">MAXTHREADS=1&#39;</span><span class="w"> </span>&gt;<span class="w"> </span>../conformance/conformance.env
+<span class="s1">quarkus.log.category."ResultLogger".level=INFO</span>
+<span class="s1">quarkus.log.category."com.intuit.karate".level=DEBUG</span>
+<span class="s1">quarkus.log.category."org.solid.testharness.http.Client".level=DEBUG</span>
+<span class="s1">quarkus.log.category."org.solid.testharness.http.AuthManager".level=DEBUG</span>
+<span class="s1">MAXTHREADS=1'</span><span class="w"> </span>&gt;<span class="w"> </span>../conformance/conformance.env
 
 <span class="c1"># Generate the test users required by the CTH on the server to be tested</span>
 npx<span class="w"> </span>ts-node<span class="w"> </span>test/deploy/createAccountCredentials.ts<span class="w"> </span>http://localhost:3000/<span class="w"> </span>&gt;&gt;<span class="w"> </span>../conformance/conformance.env
@@ -2162,7 +2162,7 @@ npx<span class="w"> </span>ts-node<span class="w"> </span>test/deploy/createAcco
 docker<span class="w"> </span>run<span class="w"> </span>-i<span class="w"> </span>--rm<span class="w"> </span><span class="se">\</span>
 <span class="w">          </span>-v<span class="w"> </span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span>/../conformance/reports/css:/reports<span class="w"> </span><span class="se">\</span>
 <span class="w">          </span>--env-file<span class="o">=</span>../conformance/conformance.env<span class="w"> </span><span class="se">\</span>
-<span class="w">          </span>--network<span class="o">=</span><span class="s2">&quot;host&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">          </span>--network<span class="o">=</span><span class="s2">"host"</span><span class="w"> </span><span class="se">\</span>
 <span class="w">          </span>solidproject/conformance-test-harness<span class="w"> </span><span class="se">\</span>
 <span class="w">          </span>--skip-teardown<span class="w"> </span><span class="se">\</span>
 <span class="w">          </span>--output<span class="o">=</span>/reports<span class="w"> </span><span class="se">\</span>
@@ -2273,10 +2273,10 @@ docker<span class="w"> </span>run<span class="w"> </span>-i<span class="w"> </sp
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tabs", "navigation.top", "navigation.indexes"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tabs", "navigation.top", "navigation.indexes"], "search": "../../assets/javascripts/workers/search.a7633da7.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
     
     
-      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      <script src="../../assets/javascripts/bundle.c21346df.min.js"></script>
       
     
   </body>
